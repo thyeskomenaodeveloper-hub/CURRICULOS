@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CV PRO — Criador de Currículos Profissionais</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+<body>
+
+  <!-- VIEW: LANDING PAGE -->
+  <div id="landingView" class="view">
+    <header class="landing-header">
+      <div class="logo">
+        <i data-lucide="file-badge"></i>
+        <span>MENAO AUTOMAÇÃO</span>
+      </div>
+      <nav class="landing-nav">
+        <a href="#beneficios">Recursos</a>
+        <a href="#modelos">Modelos</a>
+        <button class="btn-text" onclick="switchView('authView')">Entrar</button>
+        <button class="btn-primary" onclick="switchView('authView')">Criar meu currículo</button>
+      </nav>
+    </header>
+
+    <section class="hero">
+      <div class="hero-content">
+        <h1>Crie um currículo profissional que destaque suas melhores qualidades.</h1>
+        <p>Construa seu currículo em poucos minutos com modelos aprovados por recrutadores e otimizados para sistemas ATS.</p>
+        <div class="hero-buttons">
+          <button class="btn-primary btn-large" onclick="switchView('authView')">CRIAR MEU CURRÍCULO</button>
+          <button class="btn-secondary btn-large" onclick="switchView('authView')">VER MODELOS</button>
+        </div>
+      </div>
+      <div class="hero-preview">
+        <div class="preview-card-mockup">
+          <div class="mockup-line title"></div>
+          <div class="mockup-line subtitle"></div>
+          <div class="mockup-line text"></div>
+          <div class="mockup-line text short"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="beneficios" class="benefits">
+      <h2>Por que escolher a MENAO AUTOMAÇÃO?</h2>
+      <div class="benefits-grid">
+        <div class="benefit-card">
+          <i data-lucide="zap"></i>
+          <h3>Criação rápida</h3>
+          <p>Preencha seus dados de forma intuitiva e veja o resultado na hora.</p>
+        </div>
+        <div class="benefit-card">
+          <i data-lucide="layout"></i>
+          <h3>Modelos profissionais</h3>
+          <p>Design moderno desenvolvido para atrair a atenção dos recrutadores.</p>
+        </div>
+        <div class="benefit-card">
+          <i data-lucide="download-cloud"></i>
+          <h3>PDF de alta qualidade</h3>
+          <p>Baixe seu currículo pronto para impressão ou envio por e-mail.</p>
+        </div>
+        <div class="benefit-card">
+          <i data-lucide="check-circle"></i>
+          <h3>Compatível com ATS</h3>
+          <p>Estrutura otimizada para passar pelos softwares de triagem corporativa.</p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- VIEW: AUTH (LOGIN / CADASTRO) -->
+  <div id="authView" class="view hidden">
+    <div class="auth-container">
+      <div class="auth-box">
+        <div class="auth-logo" onclick="switchView('landingView')">
+          <i data-lucide="file-badge"></i>
+          <span>MENAO AUTOMAÇÃO</span>
+        </div>
+        <h2 id="authTitle">Acesse sua conta</h2>
+        <p id="authSubtitle">Entre para gerenciar seus currículos</p>
+
+        <form id="authForm" onsubmit="handleAuth(event)">
+          <div class="form-group" id="nameGroup" style="display: none;">
+            <label>Nome Completo</label>
+            <input type="text" id="authName" placeholder="Seu Nome">
+          </div>
+          <div class="form-group">
+            <label>E-mail</label>
+            <input type="email" id="authEmail" required placeholder="seu@email.com">
+          </div>
+          <div class="form-group">
+            <label>Senha</label>
+            <input type="password" id="authPassword" required placeholder="••••••••">
+          </div>
+          <button type="submit" class="btn-primary btn-full" id="authSubmitBtn">Entrar</button>
+        </form>
+
+        <div class="auth-switch">
+          <p id="authSwitchText">Não tem uma conta? <a href="#" onclick="toggleAuthMode(event)">Cadastre-se</a></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VIEW: DASHBOARD (PAINEL DO USUÁRIO) -->
+  <div id="dashboardView" class="view hidden">
+    <header class="dashboard-header">
+      <div class="logo" onclick="switchView('dashboardView')">
+        <i data-lucide="file-badge"></i>
+        <span>MENAO AUTOMAÇÃO</span>
+      </div>
+      <div class="user-menu">
+        <span id="userNameDisplay">Olá, Usuário</span>
+        <button class="btn-text" onclick="logout()">Sair</button>
+      </div>
+    </header>
+
+    <main class="dashboard-main">
+      <div class="dashboard-top">
+        <div>
+          <h2>Meus Currículos</h2>
+          <p>Crie, edite e gerencie seus documentos profissionais.</p>
+        </div>
+        <button class="btn-primary" onclick="openEditor()">
+          <i data-lucide="plus"></i> Novo Currículo
+        </button>
+      </div>
+
+      <div class="resumes-grid" id="resumesGrid">
+        <!-- Renderizado dinamicamente -->
+      </div>
+    </main>
+  </div>
+
+  <!-- VIEW: EDITOR DE CURRÍCULO -->
+  <div id="editorView" class="view hidden">
+    <header class="editor-topbar">
+      <button class="btn-secondary" onclick="switchView('dashboardView')">
+        <i data-lucide="arrow-left"></i> Voltar ao Painel
+      </button>
+      <div class="editor-title-bar">
+        <input type="text" id="cvTitleInput" value="Meu Currículo" oninput="updateCvTitle()">
+        <span class="save-status" id="saveStatus">Salvo automaticamente</span>
+      </div>
+      <button class="btn-primary" onclick="generatePDF()">
+        <i data-lucide="download"></i> Baixar PDF
+      </button>
+    </header>
+
+    <div class="editor-layout">
+      <!-- Painel Esquerdo: Formulário Passo a Passo -->
+      <aside class="editor-sidebar">
+        <!-- Indicador de Progresso -->
+        <div class="progress-container">
+          <div class="progress-bar-bg">
+            <div class="progress-bar-fill" id="progressFill" style="width: 20%;"></div>
+          </div>
+          <span class="progress-text" id="progressText">Currículo 20% completo</span>
+        </div>
+
+        <!-- Abas de Navegação das Etapas -->
+        <div class="step-tabs">
+          <button class="step-tab active" onclick="setStep(1)"><i data-lucide="user"></i> Pessoais</button>
+          <button class="step-tab" onclick="setStep(2)"><i data-lucide="target"></i> Objetivo</button>
+          <button class="step-tab" onclick="setStep(3)"><i data-lucide="briefcase"></i> Experiência</button>
+          <button class="step-tab" onclick="setStep(4)"><i data-lucide="graduation-cap"></i> Formação</button>
+          <button class="step-tab" onclick="setStep(5)"><i data-lucide="award"></i> Habilidades</button>
+          <button class="step-tab" onclick="setStep(6)"><i data-lucide="palette"></i> Estilo</button>
+        </div>
+
+        <!-- Conteúdo das Etapas -->
+        <div class="step-content-area">
+          <!-- ETAPA 1 -->
+          <div class="step-pane" id="step-1">
+            <h3>Informações Pessoais</h3>
+            <div class="form-group">
+              <label>Nome Completo</label>
+              <input type="text" id="fullName" placeholder="Ex: João da Silva" oninput="saveAndRender()">
+            </div>
+            <div class="form-group">
+              <label>Cargo / Profissão Desejada</label>
+              <input type="text" id="jobTitle" placeholder="Ex: Desenvolvedor Front-end" oninput="saveAndRender()">
+            </div>
+            <div class="form-group">
+              <label>E-mail</label>
+              <input type="email" id="email" placeholder="joao@email.com" oninput="saveAndRender()">
+            </div>
+            <div class="form-group">
+              <label>Telefone / WhatsApp</label>
+              <input type="text" id="phone" placeholder="(11) 99999-9999" oninput="saveAndRender()">
+            </div>
+            <div class="form-group">
+              <label>Cidade / Estado</label>
+              <input type="text" id="location" placeholder="São Paulo - SP" oninput="saveAndRender()">
+            </div>
+            <div class="form-group">
+              <label>LinkedIn / GitHub / Portfólio</label>
+              <input type="text" id="website" placeholder="linkedin.com/in/seuperfil" oninput="saveAndRender()">
+            </div>
+          </div>
+
+          <!-- ETAPA 2 -->
+          <div class="step-pane hidden" id="step-2">
+            <h3>Objetivo & Resumo Profissional</h3>
+            <div class="form-group">
+              <label>Resumo ou Objetivo Profissional</label>
+              <textarea id="summary" rows="6" placeholder="Escreva um breve resumo sobre suas qualificações e objetivos..." oninput="saveAndRender()"></textarea>
+            </div>
+          </div>
+
+          <!-- ETAPA 3 -->
+          <div class="step-pane hidden" id="step-3">
+            <h3>Experiência Profissional</h3>
+            <div id="experiencesContainer"></div>
+            <button type="button" class="btn-add" onclick="addExperience()"><i data-lucide="plus"></i> Adicionar Experiência</button>
+          </div>
+
+          <!-- ETAPA 4 -->
+          <div class="step-pane hidden" id="step-4">
+            <h3>Formação Acadêmica</h3>
+            <div id="educationContainer"></div>
+            <button type="button" class="btn-add" onclick="addEducation()"><i data-lucide="plus"></i> Adicionar Formação</button>
+          </div>
+
+          <!-- ETAPA 5 -->
+          <div class="step-pane hidden" id="step-5">
+            <h3>Habilidades & Competências</h3>
+            <div class="form-group">
+              <label>Habilidades (separadas por vírgula)</label>
+              <textarea id="skills" rows="4" placeholder="Ex: Gestão de Projetos, JavaScript, Liderança, Pacote Office" oninput="saveAndRender()"></textarea>
+            </div>
+          </div>
+
+          <!-- ETAPA 6 -->
+          <div class="step-pane hidden" id="step-6">
+            <h3>Personalização de Estilo</h3>
+            <div class="form-group">
+              <label>Cor Principal</label>
+              <input type="color" id="primaryColor" value="#0f172a" oninput="saveAndRender()">
+            </div>
+            <div class="form-group">
+              <label>Fonte do Documento</label>
+              <select id="fontFamily" onchange="saveAndRender()">
+                <option value="'Inter', sans-serif">Inter (Moderna)</option>
+                <option value="'Arial', sans-serif">Arial (Clássica)</option>
+                <option value="'Times New Roman', serif">Times New Roman (Formal)</option>
+                <option value="'Georgia', serif">Georgia (Elegante)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Painel Direito: Pré-visualização em Tempo Real -->
+      <main class="editor-preview">
+        <div id="resumePreview" class="cv-template">
+          <header class="cv-header" id="cvHeader">
+            <h1 id="pvName">SEU NOME COMPLETO</h1>
+            <h3 id="pvTitle">CARGO DESEJADO</h3>
+            <div class="cv-contact" id="pvContact">
+              <span id="pvEmail">email@exemplo.com</span>
+              <span id="pvPhone">(00) 00000-0000</span>
+              <span id="pvLocation">Cidade - UF</span>
+              <span id="pvWebsite">linkedin.com/in/perfil</span>
+            </div>
+          </header>
+
+          <section class="cv-block" id="blockSummary">
+            <h4 class="cv-section-title">Resumo Profissional</h4>
+            <p id="pvSummary">Preencha os campos ao lado para ver seu currículo atualizado em tempo real.</p>
+          </section>
+
+          <section class="cv-block" id="blockExperience">
+            <h4 class="cv-section-title">Experiência Profissional</h4>
+            <div id="pvExperiences"></div>
+          </section>
+
+          <section class="cv-block" id="blockEducation">
+            <h4 class="cv-section-title">Formação Acadêmica</h4>
+            <div id="pvEducation"></div>
+          </section>
+
+          <section class="cv-block" id="blockSkills">
+            <h4 class="cv-section-title">Habilidades</h4>
+            <div id="pvSkills" class="skills-tags"></div>
+          </section>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
